@@ -1,7 +1,7 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from .. import models, schemas, utilities, oauth2
+from .. import models, schemas, oauth2
 from ..database import engine, get_db
 
 router=APIRouter(
@@ -27,7 +27,6 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), curr
     if order.trigger_price is None and order.type != "market":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A pending order has to include a trigger price")
     
-    print(current_user)
     new_order = models.Order(owner_id=current_user.id, **order.dict())
     db.add(new_order)
     db.commit()
@@ -85,7 +84,7 @@ def update_order(order_id: int,order_update: schemas.OrderUpdate,db: Session = D
     return existing_order
 
 @router.put("/orders_closing/{order_id}", response_model=schemas.OrderOut)
-def update_order(order_id: int,db: Session = Depends(get_db),current_user: models.User = Depends(oauth2.get_current_user)):
+def close_order(order_id: int,db: Session = Depends(get_db),current_user: models.User = Depends(oauth2.get_current_user)):
     # Retrieve the order from the database
     existing_order = db.query(models.Order).filter(models.Order.id == order_id).first()
 

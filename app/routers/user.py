@@ -27,10 +27,14 @@ def create_user(user: schemas.UserCreate, db: Session=Depends(get_db)):
 
 @router.get("/users/me", response_model=schemas.UserOut)
 def get_active_user(db: Session = Depends(get_db), user_id: int=Depends(oauth2.get_current_user)):
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The current user deleted their account")
     return user_id
 
 @router.put("/users/me", response_model=schemas.UserOut)
 def update_user_me(user_update: schemas.UserUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
+    if current_user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The current user deleted their account")
     try:
         if user_update.username:
             current_user.username = user_update.username
@@ -54,6 +58,8 @@ def update_user_me(user_update: schemas.UserUpdate, db: Session = Depends(get_db
 
 @router.get("/users/competing", response_model=List[schemas.UserList])
 def get_competing_users(db: Session = Depends(get_db), user_id: int=Depends(oauth2.get_current_user), limit: int=100):
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="The current user deleted his account")
     users = db.query(models.User).filter(models.User.status == 'competing').order_by(models.User.id.desc()).limit(limit).all()
     if not users:
         raise HTTPException(status_code=404, detail="No competing users found")
@@ -62,6 +68,8 @@ def get_competing_users(db: Session = Depends(get_db), user_id: int=Depends(oaut
 
 @router.get("/users/failed", response_model=List[schemas.UserList])
 def get_failed_users(db: Session = Depends(get_db), user_id: int=Depends(oauth2.get_current_user), limit: int=100):
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="The current user deleted his account")
     users = db.query(models.User).filter(models.User.status == 'out').order_by(models.User.id.desc()).limit(limit).all()
     if not users:
         raise HTTPException(status_code=404, detail="No failed users found")
@@ -70,8 +78,24 @@ def get_failed_users(db: Session = Depends(get_db), user_id: int=Depends(oauth2.
 
 @router.get("/users/{id}", response_model=schemas.UserOut)
 def get_user(id:int, db: Session=Depends(get_db), user_id: int= Depends(oauth2.get_current_user)):
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="The current user deleted his account")
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with id: {id} does not exist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This user does not exist.")
     
     return user
+
+
+@router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user_me(db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
+    try:
+        # Delete the user from the database
+        db.delete(current_user)
+        db.commit()
+
+        return None  # Return None with status 204 (No Content) on successful deletion
+    except Exception as e:
+        # Rollback the transaction in case of an error
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting user: {str(e)}")

@@ -1,10 +1,13 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, validator, Field
-from decimal import Decimal, getcontext
+from decimal import Decimal
 from typing import Optional
-getcontext().prec = 8
 
+#currencies router:
 
+class CurrencyRequest(BaseModel):
+    from_currency: str
+    to_currency: str
 
 # auth router
 class UserLogin(BaseModel):
@@ -74,12 +77,12 @@ class OrderOut(BaseModel):
     type: str
     objective: str
     currency_pair: str
+    current_profit: Decimal
     trigger_price: Optional[Decimal] = None
     triggered: bool
     quantity_in_lots: Decimal
     take_profit: Optional[Decimal] = None
     stop_loss: Optional[Decimal] = None
-    current_profit: Decimal
     status: str
     created_at: datetime
 
