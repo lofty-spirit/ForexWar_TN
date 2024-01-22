@@ -1,18 +1,22 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from decimal import getcontext
 from .. import models, schemas, oauth2
-from ..database import engine, get_db
+from ..database import get_db
+from . import currencies
 
+getcontext().prec = 10
 router=APIRouter(
     tags=['Trading']
 )
-
-
+currencies_list=["TNDEUR","EURUSD","USDCAD"]
 @router.post("/orders/", response_model=schemas.OrderOut, status_code=status.HTTP_201_CREATED)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
-    if order.currency_pair not in ["TNDEUR","EURUSD","USDCAD"]:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Available currency pairs TNDEUR, EURUSD or USDCAD")
+    currencies.fetch_and_store_exchange_rates()
+    rates_list=[currencies.TNDEUR_rate, currencies.EURUSD_rate, currencies.USDCAD_rate]
+    if order.currency_pair not in currencies_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Available currency pairs are TNDEUR, EURUSD or USDCAD")
     
     if order.type not in ["market","limit","stop"]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Type can only be market, limit or stop")
@@ -26,6 +30,15 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), curr
 
     if order.trigger_price is None and order.type != "market":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A pending order has to include a trigger price")
+    
+    if (order.objective=="buy" and order.type=="limit") or (order.objective=="sell" and order.type=="stop"):
+            if order.trigger_price>rates_list[currencies_list.index(order.currency_pair)]:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The trigger price is above the current price.")
+            
+    if (order.objective=="sell" and order.type=="limit") or (order.objective=="buy" and order.type=="stop"):
+            if order.trigger_price<rates_list[currencies_list.index(order.currency_pair)]:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The trigger price is below the current price.")
+
     
     new_order = models.Order(owner_id=current_user.id, **order.dict())
     db.add(new_order)
@@ -54,6 +67,8 @@ def get_open_orders(db: Session = Depends(get_db), current_user: models.User = D
 
 @router.put("/orders/{order_id}", response_model=schemas.OrderOut)
 def update_order(order_id: int,order_update: schemas.OrderUpdate,db: Session = Depends(get_db),current_user: models.User = Depends(oauth2.get_current_user)):
+    currencies.fetch_and_store_exchange_rates()
+    rates_list=[currencies.TNDEUR_rate, currencies.EURUSD_rate, currencies.USDCAD_rate]
     # Retrieve the order from the database
     existing_order = db.query(models.Order).filter(models.Order.id == order_id).first()
 

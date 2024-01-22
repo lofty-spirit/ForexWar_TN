@@ -1,9 +1,9 @@
-from fastapi import status, HTTPException, Depends, APIRouter
+from fastapi import HTTPException, APIRouter
 from decimal import Decimal, getcontext
 import requests #fastforex API documentation
 from ..schemas import CurrencyRequest
 
-
+getcontext().prec = 10
 router=APIRouter(
     tags=["Currencies"]
 )

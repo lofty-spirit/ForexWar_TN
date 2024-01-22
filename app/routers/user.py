@@ -4,6 +4,7 @@ from typing import List
 from .. import models, schemas, utilities, oauth2
 from ..database import engine, get_db
 
+
 router=APIRouter(
     tags=['Profile']
 )
@@ -23,7 +24,7 @@ def create_user(user: schemas.UserCreate, db: Session=Depends(get_db)):
     except Exception as e:
         # Rollback the transaction in case of an error
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error creating user: {str(e)}")
+        raise HTTPException(status_code=500, detail="The username and/or email already exists")
 
 @router.get("/users/me", response_model=schemas.UserOut)
 def get_active_user(db: Session = Depends(get_db), user_id: int=Depends(oauth2.get_current_user)):
