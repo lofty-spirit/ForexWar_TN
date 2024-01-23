@@ -11,5 +11,5 @@ An API-based solution that allows the following :
 6. Deleting Profile
 
 ## Check report.pdf for more details about  this market simulation.
-Report Link: https://www.overleaf.com/read/gnfcpngjbgqw#77eb0e
+Report Link: https://www.overleaf.com/read/gnfcpngjbgqw#77eb0e <br>
 Presentation Link: https://www.overleaf.com/read/mdqrwfqrsdwt#0caf06
