@@ -13,3 +13,7 @@ An API-based solution that allows the following :
 ## Check report.pdf for more details about  this market simulation.
 Report Link: https://www.overleaf.com/read/gnfcpngjbgqw#77eb0e <br>
 Presentation Link: https://www.overleaf.com/read/mdqrwfqrsdwt#0caf06
+
+
+## The following video explains how to run & use the API:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rx_pZRvztQo?si=ndwjPs_Zkf14Cp2r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
