@@ -16,4 +16,6 @@ Presentation Link: https://www.overleaf.com/read/mdqrwfqrsdwt#0caf06
 
 
 ## The following video explains how to run & use the API:
-<iframe width="560" height="315" src="https://www.youtube.com/embed/rx_pZRvztQo?si=ndwjPs_Zkf14Cp2r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=rx_pZRvztQo
+" target="_blank"><img src="http://img.youtube.com/vi/rx_pZRvztQo/0.jpg" 
+alt="Click the image to watch the video" width="240" height="180" border="10" /></a>
