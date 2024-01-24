@@ -68,9 +68,9 @@ async def get_time_series(request_body: CurrencyRequest):
     base_url = "https://api.fastforex.io/time-series"
 
     # Calculate the start and end dates for the last 14 days
-    # Assuming today's date is 2024-01-22
+    # Assuming today's date is 2024-01-24
     import datetime
-    end_date = datetime.date(2024, 1, 22)
+    end_date = datetime.date(2024, 1, 24)
     start_date = end_date - datetime.timedelta(days=13)
 
     url = f"{base_url}?from={request_body.from_currency}&to={request_body.to_currency}&start={start_date}&end={end_date}&api_key={api_key}"
