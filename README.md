@@ -4,11 +4,12 @@
 
 An API-based solution that allows the following :
 1. Profile Creation
-2. Profile Checking
-3. Orders Creation
-4. Orders Changing
-5. Orders Checking
-6. Deleting Profile
+2. Profile Changing
+3. Profile Checking
+4. Orders Creation
+5. Orders Changing
+6. Orders Checking
+7. Deleting Profile
 
 ## Check report.pdf for more details about  this market simulation.
 Report Link: https://www.overleaf.com/read/gnfcpngjbgqw#77eb0e <br>
